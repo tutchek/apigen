@@ -69,14 +69,21 @@ class Model extends NetteX\Object
 				}
 			}
 
-                        foreach ($class->getMethods() as $method) {
+                        foreach (array_merge($class->getMethods(), $class->getProperties()) as $method) {
                             $annotations = $method->getAnnotations();
                             
                             foreach ($annotations as $foo => $annotations) {
                                 foreach ($annotations as $annotation) {
                                     $c = \preg_split(';\s;', trim($annotation));
                                     if (!isset($this->classes[$c[0]]) && class_exists($c[0])) {
-                                        $this->classes[$c[0]] = new CustomClassReflection($c[0]);
+                                        $methodClass = new CustomClassReflection($c[0]);
+                                        $this->classes[$c[0]] = $methodClass;
+
+                                        foreach (array_merge(class_parents($c[0]), $methodClass->getInterfaceNames()) as $parent) {
+                                                if (!isset($this->classes[$parent])) {
+                                                        $this->classes[$parent] = new CustomClassReflection($parent);
+                                                }
+                                        }
                                     }
                                 }
                             }
