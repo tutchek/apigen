@@ -21,7 +21,7 @@ APIGen version 0.1
 ------------------
 ';
 
-$options = getopt('s:d:c:t:');
+$options = getopt('s:d:c:t:b:');
 
 if (!isset($options['s'], $options['d'])) { ?>
 Usage:
@@ -32,6 +32,7 @@ Options:
 	-d <path>  Folder where to save the generated documentation. Required.
 	-c <path>  Output config file.
 	-t ...     Title of generated documentation.
+        -b <path>  Bootstrap php file.
 
 <?php
 	die();
@@ -44,6 +45,15 @@ NetteX\Debug::enable();
 NetteX\Debug::timer();
 
 
+if (isset($options['b'])) {
+    $path = realpath($options['b']);
+
+    if ($path === false) {
+        die('Bootstrap file does not exist.');
+    } else {
+        require_once $options['b'];
+    }
+}
 
 echo "Scanning folder $options[s]\n";
 $model = new Apigen\Model;
