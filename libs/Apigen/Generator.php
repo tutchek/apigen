@@ -136,7 +136,13 @@ class Generator extends NetteX\Object
 		});
 		$fshl = new \fshlParser('HTML_UTF8');
 		$template->registerHelper('dump', function($val) use ($fshl) {
-			return $fshl->highlightString('PHP', var_export($val, TRUE));
+                    // It is not possible to have instanced here
+                    // However if the documented object is also used (e.g. Zend_Loader_Autoloader)
+                    // It can lead to nasty stack overflow if recursion exists...
+                    if (\is_object($val)) {
+                        return '';
+                    }
+                    return $fshl->highlightString('PHP', var_export($val, TRUE));
 		});
 
 		// links
